@@ -1,6 +1,6 @@
 mod models;
 
-use reqwest::{Client, StatusCode};
+use reqwest::{Client, StatusCode, ClientBuilder};
 use serde::Deserialize;
 use std::fmt::{Result as FmtResult, Formatter, Display};
 use std::collections::HashMap;
@@ -22,7 +22,7 @@ const REDIRECT_URL: &str = "https://www.epicgames.com/id/logout?redirectUrl=http
 async fn main() -> Result<(), Box<dyn Error>> {
     println!("Fortnite Save The World Daily claimer made by Thoo (Lmao#0001 on discord if you have problems)");
     println!("WARNING: Do NOT show the contents of device.json to ANYONE\n");
-    let claimer = Claimer::new();
+    let claimer = Claimer::new()?;
     if !Path::new("device.json").exists() {
         if !open_url(REDIRECT_URL) {
             println!("Couldn't open URL.");
@@ -78,10 +78,10 @@ struct Claimer {
 
 impl Claimer {
 
-    pub fn new() -> Self {
-        Self {
-            client: Client::new()
-        }
+    pub fn new() -> Result<Self, Box<dyn Error>> {
+        Ok(Self {
+            client: ClientBuilder::new().user_agent("FortniteGame/++Fortnite+Release-13.30-CL-13884634/Android/10").build()?
+        })
     }
 
     pub async fn authorization(&self, code: &str) -> Result<LoginModel, Box<dyn Error>> {
